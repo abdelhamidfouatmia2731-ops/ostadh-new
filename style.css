@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>منصة الأستاذ الذكية</title>
+
+  <!-- Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- Excel -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+  <!-- ZIP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+
+<body>
+
+<div id="toastContainer"></div>
+
+<!-- =====================================================
+     APP
+===================================================== -->
+
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+
+  <aside class="sidebar" id="sidebar">
+
+    <div class="brand">
+      <div class="brand-icon">
+        <i class="fa-solid fa-chalkboard-user"></i>
+      </div>
+
+      <div>
+        <h1>منصة الأستاذ</h1>
+        <span>المتابعة البيداغوجية الشاملة</span>
+      </div>
+    </div>
+
+    <div class="school-year">
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>الموسم الدراسي</span>
+      <strong id="schoolYearLabel">2026 / 2027</strong>
+    </div>
+
+    <nav class="main-nav">
+
+      <button class="nav-item active" data-view="homeView">
+        <i class="fa-solid fa-house"></i>
+        <span>الرئيسية</span>
+      </button>
+
+      <div class="nav-title">البيداغوجي</div>
+
+      <button class="nav-item" data-view="studentsView">
+        <i class="fa-solid fa-users"></i>
+        <span>التلاميذ والأقسام</span>
+      </button>
+
+      <button class="nav-item" data-view="scheduleView">
+        <i class="fa-solid fa-calendar-week"></i>
+        <span>استعمال الزمن</span>
+      </button>
+
+      <button class="nav-item" data-view="monitoringView">
+        <i class="fa-solid fa-clipboard-check"></i>
+        <span>المتابعة والتقييم</span>
+      </button>
+
+      <button class="nav-item" data-view="dailyLogView">
+        <i class="fa-solid fa-book"></i>
+        <span>دفتر اليومي</span>
+      </button>
+
+      <button class="nav-item" data-view="annualPlanView">
+        <i class="fa-solid fa-chart-column"></i>
+        <span>التوزيع السنوي</span>
+      </button>
+
+      <button class="nav-item" data-view="memosView">
+        <i class="fa-solid fa-file-lines"></i>
+        <span>المذكرات</span>
+      </button>
+
+      <button class="nav-item" data-view="examsView">
+        <i class="fa-solid fa-file-circle-check"></i>
+        <span>الفروض والاختبارات</span>
+      </button>
+
+      <div class="nav-title">الإدارة</div>
+
+      <button class="nav-item" data-view="statisticsView">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>الإحصائيات</span>
+      </button>
+
+      <button class="nav-item" data-view="profileView">
+        <i class="fa-solid fa-id-card"></i>
+        <span>الملف المهني</span>
+      </button>
+
+      <button class="nav-item" data-view="documentsView">
+        <i class="fa-solid fa-folder-open"></i>
+        <span>الوثائق الإدارية</span>
+      </button>
+
+      <button class="nav-item" data-view="backupView">
+        <i class="fa-solid fa-database"></i>
+        <span>النسخ الاحتياطي</span>
+      </button>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+      <button class="nav-item assistant-button" data-view="assistantView">
+        <i class="fa-solid fa-robot"></i>
+        <span>المساعد الذكي</span>
+      </button>
+
+      <div class="storage-status">
+        <span class="status-dot"></span>
+        <span>التخزين المحلي فعال</span>
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <!-- ================= MAIN ================= -->
+
+<main class="main">
+
+  <header class="topbar">
+
+    <button class="mobile-menu" id="mobileMenuBtn">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <button class="mobile-back" id="mobileBackBtn" type="button">
+      <i class="fa-solid fa-arrow-right"></i>
+      <span>الرئيسية</span>
+    </button>
+
+    <div class="page-title">
+      <h2 id="pageTitle">لوحة القيادة</h2>
+      <p id="currentDateText"></p>
+    </div>
+
+    <div class="top-actions">
+
+      <button class="icon-button" id="globalSearchBtn" title="البحث">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+
+      <button class="icon-button" id="quickBackupBtn" title="نسخة احتياطية">
+        <i class="fa-solid fa-cloud-arrow-down"></i>
+      </button>
+
+      <div class="profile-mini">
+        <div class="avatar" id="miniAvatar">أ</div>
+
+        <div>
+          <strong id="miniName">الأستاذ</strong>
+          <small>أستاذ</small>
+        </div>
+      </div>
+
+    </div>
+
+  </header>
+
+  <section class="content">
+      <!-- =================================================
+           HOME
+      ================================================= -->
+
+      <div class="view active" id="homeView">
+
+        <div class="welcome-card">
+
+          <div>
+            <span class="eyebrow">لوحة القيادة</span>
+            <h2>مرحباً بك في منصة الأستاذ الذكية</h2>
+            <p>
+              مركز موحد لتنظيم العمل البيداغوجي والإداري
+              ومتابعة التلاميذ والوثائق والحصص.
+            </p>
+
+            <button class="primary-btn" data-view="monitoringView">
+              <i class="fa-solid fa-play"></i>
+              بدء المتابعة
+            </button>
+          </div>
+
+          <div class="welcome-illustration">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+
+        </div>
+
+
+        <div class="section-heading">
+          <div>
+            <h3>ملخص اليوم</h3>
+            <p>أهم المعلومات الخاصة بعملك.</p>
+          </div>
+        </div>
+
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+              <span>التلاميذ</span>
+              <strong id="dashboardStudents">0</strong>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon purple">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div>
+              <span>الأقسام</span>
+              <strong id="dashboardClasses">0</strong>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div>
+              <span>الحصص اليوم</span>
+              <strong id="dashboardTodayLessons">0</strong>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon orange">
+              <i class="fa-solid fa-user-xmark"></i>
+            </div>
+            <div>
+              <span>الغيابات</span>
+              <strong id="dashboardAbsences">0</strong>
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="dashboard-two-columns">
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>حصص اليوم</h3>
+                <span id="todayScheduleDate"></span>
+              </div>
+
+              <button class="text-btn" data-view="scheduleView">
+                عرض الجدول
+              </button>
+            </div>
+
+            <div id="todayLessonsList" class="lesson-list empty-state">
+              لا توجد حصص مسجلة اليوم.
+            </div>
+          </div>
+
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>المهام والتنبيهات</h3>
+                <span>تنبيهات المنصة</span>
+              </div>
+            </div>
+
+            <div id="notificationsList" class="notifications-list">
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="panel progress-panel">
+
+          <div class="panel-header">
+            <div>
+              <h3>تقدم البرنامج السنوي</h3>
+              <span>تقدير عام بناءً على الحصص المسجلة</span>
+            </div>
+
+            <strong id="annualProgressText">0%</strong>
+          </div>
+
+          <div class="progress-bar">
+            <div id="annualProgressBar"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           STUDENTS
+      ================================================= -->
+
+      <div class="view" id="studentsView">
+
+        <div class="view-header">
+          <div>
+            <span class="eyebrow">التلاميذ والأقسام</span>
+            <h2>إدارة التلاميذ</h2>
+            <p>استيراد قوائم التلاميذ وتنظيم الأقسام.</p>
+          </div>
+
+          <div class="header-actions">
+            <button class="secondary-btn" id="addClassBtn">
+              <i class="fa-solid fa-plus"></i>
+              قسم جديد
+            </button>
+            <button id="addStudentBtn" class="primary-btn">
+  <i class="fa-solid fa-user-plus"></i> إضافة تلميذ
+</button>
+
+
+            <label class="primary-btn file-label">
+              <i class="fa-solid fa-file-excel"></i>
+              استيراد Excel
+              <input type="file" id="excelFile" accept=".xlsx,.xls">
+            </label>
+          </div>
+        </div>
+
+
+        <div class="import-help">
+          <i class="fa-solid fa-circle-info"></i>
+          <div>
+            <strong>استيراد القوائم</strong>
+            <p>
+              يفضل أن يحتوي الملف على أعمدة الاسم واللقب.
+              سيتم استخراج أسماء التلاميذ تلقائياً.
+            </p>
+          </div>
+        </div>
+
+
+        <div class="classes-grid" id="classesGrid"></div>
+
+
+        <div id="classTableScreen" class="panel hidden">
+
+          <div class="panel-header">
+
+            <div>
+              <button class="back-btn" id="backToClassesBtn">
+                <i class="fa-solid fa-arrow-right"></i>
+                الأقسام
+              </button>
+
+              <h3 id="selectedClassTitle">القسم</h3>
+              <span id="selectedClassMeta"></span>
+            </div>
+
+            <div class="header-actions">
+              <button class="secondary-btn" id="exportClassBtn">
+                <i class="fa-solid fa-file-export"></i>
+                تصدير
+              </button>
+
+              <button class="danger-outline-btn" id="deleteClassBtn">
+                <i class="fa-solid fa-trash"></i>
+                حذف القسم
+              </button>
+            </div>
+
+          </div>
+
+
+          <div class="table-toolbar">
+
+            <div class="search-box">
+              <i class="fa-solid fa-search"></i>
+              <input id="studentSearch" placeholder="ابحث عن تلميذ...">
+            </div>
+
+            <div class="session-count">
+              <i class="fa-solid fa-calendar-check"></i>
+              <span>عدد الحصص:</span>
+              <strong id="sessionCountBadge">0</strong>
+            </div>
+
+          </div>
+
+
+          <div class="tabs">
+
+            <button class="tab active" data-tab="studentsTab">
+              قائمة التلاميذ
+            </button>
+
+            <button class="tab" data-tab="absenceTab">
+              الغيابات
+            </button>
+
+            <button class="tab" data-tab="evaluationTab">
+              التقييم النهائي
+            </button>
+
+          </div>
+
+
+          <div class="tab-content active" id="studentsTab">
+
+            <div class="table-wrapper">
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>اللقب</th>
+                    <th>الاسم</th>
+                    <th>الحضور</th>
+                    <th>الغياب</th>
+                    <th>إجراءات</th>
+                  </tr>
+                </thead>
+
+                <tbody id="studentsTableBody"></tbody>
+              </table>
+
+            </div>
+
+          </div>
+
+
+          <div class="tab-content" id="absenceTab">
+
+            <div class="session-filter">
+
+              <div class="field">
+                <label>التاريخ</label>
+                <input type="date" id="filterDateInput">
+              </div>
+
+              <div class="field">
+                <label>الحصة</label>
+                <select id="filterSessionNumSelect">
+                  <option value="1">08:00-09:00</option>
+                  <option value="2">09:00-10:00</option>
+                  <option value="3">10:00-11:00</option>
+                  <option value="4">11:00-12:00</option>
+                  <option value="5">13:30-14:30</option>
+                  <option value="6">14:30-15:30</option>
+                  <option value="7">15:30-16:30</option>
+                  <option value="8">16:30-17:30</option>
+                </select>
+              </div>
+
+              <button class="primary-btn" id="loadSessionBtn">
+                <i class="fa-solid fa-folder-open"></i>
+                فتح الحصة
+              </button>
+
+            </div>
+
+            <div id="singleSessionTable"></div>
+
+            <div class="panel-subsection">
+              <h4>سجل الغيابات حسب التاريخ</h4>
+              <div id="absenceHistory"></div>
+            </div>
+
+          </div>
+
+
+          <div class="tab-content" id="evaluationTab">
+
+            <div class="evaluation-info">
+              <div>
+                <strong>نظام التقييم</strong>
+                <p>
+                  A = لا خصم، B = خصم متوسط، C = خصم كبير،
+                  D = خصم كامل حسب وزن المعيار.
+                </p>
+              </div>
+            </div>
+
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>التلميذ</th>
+                    <th>الحضور</th>
+                    <th>السلوك</th>
+                    <th>الأدوات</th>
+                    <th>الكراس</th>
+                    <th>المشاركة</th>
+                    <th>العمل الفردي</th>
+                    <th>العمل الفوجي</th>
+                    <th>المبادرة</th>
+                    <th>المعدل</th>
+                    <th>الفرض</th>
+                    <th>الاختبار</th>
+                  </tr>
+                </thead>
+
+                <tbody id="evaluationTableBody"></tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           SCHEDULE
+      ================================================= -->
+
+      <div class="view" id="scheduleView">
+
+        <div class="view-header">
+
+          <div>
+            <span class="eyebrow">التخطيط</span>
+            <h2>استعمال الزمن</h2>
+            <p>أنشئ جدولك الأسبوعي واربط الحصص بالأقسام.</p>
+          </div>
+
+          <button class="primary-btn" id="addScheduleBtn">
+            <i class="fa-solid fa-plus"></i>
+            إضافة حصة
+          </button>
+
+        </div>
+
+
+        <div class="schedule-grid" id="scheduleGrid"></div>
+
+      </div>
+
+
+      <!-- =================================================
+           MONITORING
+      ================================================= -->
+
+      <div class="view" id="monitoringView">
+
+        <div class="view-header">
+
+          <div>
+            <span class="eyebrow">المتابعة البيداغوجية</span>
+            <h2>المتابعة والتقييم</h2>
+            <p>تسجيل متابعة كل تلميذ في كل حصة.</p>
+          </div>
+
+        </div>
+
+
+        <div class="monitoring-selector panel">
+
+          <div class="field">
+            <label>القسم</label>
+            <select id="monitoringClassSelect"></select>
+          </div>
+
+          <div class="field">
+            <label>التاريخ</label>
+            <input type="date" id="monitoringDate">
+          </div>
+
+          <div class="field">
+            <label>الحصة</label>
+            <select id="monitoringSession">
+              <option value="1">08:00-09:00</option>
+              <option value="2">09:00-10:00</option>
+              <option value="3">10:00-11:00</option>
+              <option value="4">11:00-12:00</option>
+              <option value="5">13:30:14:30</option>
+              <option value="6">14:30-15:30</option>
+              <option value="7">15:30-16:30</option>
+              <option value="8">16:30-17:30</option>
+            </select>
+          </div>
+
+          <button class="primary-btn" id="openMonitoringBtn">
+            <i class="fa-solid fa-clipboard-check"></i>
+            فتح المتابعة
+          </button>
+
+        </div>
+
+
+        <div class="panel">
+
+          <div class="panel-header">
+            <div>
+              <h3>معايير المتابعة</h3>
+              <span>A / B / C / D</span>
+            </div>
+
+            <button class="primary-btn" id="saveMonitoringBtn">
+              <i class="fa-solid fa-save"></i>
+              حفظ المتابعة
+            </button>
+          </div>
+
+
+          <div class="criteria-legend">
+
+            <div><b>A</b> ممتاز</div>
+            <div><b>B</b> جيد</div>
+            <div><b>C</b> يحتاج متابعة</div>
+            <div><b>D</b> غير مرضٍ</div>
+
+          </div>
+
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>التلميذ</th>
+                  <th>الحضور</th>
+                  <th>السلوك <small>3</small></th>
+                  <th>الأدوات <small>3</small></th>
+                  <th>الكراس <small>3</small></th>
+                  <th>المشاركة <small>3</small></th>
+                  <th>عمل فردي <small>3</small></th>
+                  <th>عمل فوج <small>1</small></th>
+                  <th>مبادرة <small>1</small></th>
+                </tr>
+              </thead>
+
+              <tbody id="monitoringTableBody"></tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           DAILY LOG
+      ================================================= -->
+
+     <div class="view" id="dailyLogView">
+  <div class="view-header">
+    <div>
+      <span class="eyebrow">التوثيق</span>
+      <h2>دفتر اليومي</h2>
+      <p>تسجيل سير الحصة وربطها بالدرس والمقطع.</p>
+    </div>
+    <button class="primary-btn" id="newDailyLogBtn">
+      <i class="fa-solid fa-plus"></i>
+      سجل جديد
+    </button>
+  </div>
+
+  <!-- نموذج التسجيل -->
+  <div class="panel">
+    
+    <!-- القسم الأول: المعلومات الأساسية للحصة -->
+    <div class="section-group">
+      <h3 class="section-title"><i class="fa-solid fa-circle-info"></i> معلومات الحصة</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>التاريخ</label>
+          <input type="date" id="logDate">
+        </div>
+        <div class="field">
+          <label>القسم</label>
+          <select id="logClass"></select>
+        </div>
+        <div class="field">
+          <label>الحصة</label>
+          <select id="logSession">
+            <option value="1">08:00 - 09:00</option>
+            <option value="2">09:00 - 10:00</option>
+            <option value="3">10:00 - 11:00</option>
+            <option value="4">11:00 - 12:00</option>
+            <option value="5">13:30 - 14:30</option>
+            <option value="6">14:30 - 15:30</option>
+            <option value="7">15:30 - 16:30</option>
+            <option value="8">16:30 - 17:30</option>
+          </select>
+        </div>
+        <div class="field">
+  <label>الميدان</label>
+  <select id="logField">
+    <option value="">... اختر الميدان</option>
+    <option value="الأنشطة العددية">الأنشطة العددية</option>
+    <option value="الأنشطة الهندسية">الأنشطة الهندسية</option>
+    <option value="تنظيم معطيات">تنظيم معطيات</option>
+  </select>
+</div>
+
+        <div class="field">
+          <label>المقطع</label>
+          <input id="logSegment" placeholder="مثال: المقطع الأول">
+        </div>
+        <div class="field">
+          <label>الكفاءة المستهدفة</label>
+          <input id="logCompetence" placeholder="أدخل الكفاءة المستهدفة">
+        </div>
+      </div>
+      <div class="field full">
+        <label>المورد المعرفي / عنوان الدرس</label>
+        <input id="logLessonTitle" placeholder="عنوان الدرس أو المورد">
+      </div>
+    </div>
+
+    <!-- القسم الثاني: بناء الدرس وسيرورته -->
+    <div class="section-group">
+      <h3 class="section-title"><i class="fa-solid fa-chalkboard-user"></i> الممارسات البيداغوجية</h3>
+      <div class="form-grid-2">
+        <div class="field">
+          <label>وضعية الانطلاق</label>
+          <textarea id="logSituation" placeholder="صف وضعية الانطلاق أو التمهيد..."></textarea>
+        </div>
+        <div class="field">
+          <label>سيرورة الدرس</label>
+          <textarea id="logProcedure" placeholder="مراحل إنجاز الدرس وبناء المعارف..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- القسم الثالث: التقويم والمتابعة -->
+    <div class="section-group">
+      <h3 class="section-title"><i class="fa-solid fa-clipboard-check"></i> التقويم والمتابعة</h3>
+      <div class="form-grid-2">
+        <div class="field">
+          <label>التقويم (التشخيصي/التكويني/التحصيلي)</label>
+          <textarea id="logAssessment" placeholder="طريقة وتقويم استيعاب التلاميذ..."></textarea>
+        </div>
+        <div class="field">
+          <label>الواجب المنزلي</label>
+          <textarea id="logHomework" placeholder="التمارين أو الأنشطة المنزلية المقترحة..."></textarea>
+        </div>
+      </div>
+      <div class="field full">
+        <label>ملاحظات عامة</label>
+        <textarea id="logNotes" class="large-textarea" placeholder="ملاحظات حول سيرورة الحصة، الصعوبات، أو التوجيهات..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="primary-btn" id="saveDailyLogBtn">
+        <i class="fa-solid fa-save"></i>
+        حفظ في دفتر اليومي
+      </button>
+    </div>
+
+  </div>
+
+  
+      
+      <!-- لوحة السجلات السابقة -->
+  <div class="panel">
+    <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h3>السجلات السابقة</h3>
+      </div>
+      <button class="secondary-btn" id="printLogsBtn" style="padding: 6px 12px; cursor: pointer;">
+        <i class="fa-solid fa-print"></i> طباعة / تصدير A4
+      </button>
+    </div>
+
+    <div class="table-container">
+      <table class="custom-table" id="logsTable">
+        <thead>
+          <tr>
+            <th>التاريخ</th>
+            <th>القسم</th>
+            <th>الحصة</th>
+            <th>الميدان</th>
+            <th>المقطع</th>
+            <th>المورد / الدرس</th>
+            <th>تقويم تشخيصي</th>
+            <th>واجب منزلي</th>
+            <th>ملاحظات</th>
+            <th class="print-hide">الإجراءات</th> <!-- أضفنا هذا الصنف لإخفائه عند الطباعة -->
+          </tr>
+        </thead>
+        <tbody id="logsTableBody">
+          <tr class="empty-row">
+            <td colspan="10" style="text-align: center; color: #888;">لا توجد سجلات مضافة حتى الآن</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+
+      <!-- =================================================
+           ANNUAL PLAN
+      ================================================= -->
+
+      <div class="view" id="annualPlanView">
+
+        <div class="view-header">
+
+          <div>
+            <span class="eyebrow">التخطيط السنوي</span>
+            <h2>التوزيع السنوي والموارد</h2>
+            <p>حفظ الملفات وتنظيم التقدم في البرنامج.</p>
+          </div>
+
+        </div>
+
+
+        <div class="upload-card">
+
+          <div class="upload-icon">
+            <i class="fa-solid fa-file-arrow-up"></i>
+          </div>
+
+          <h3>إضافة ملف</h3>
+          <p>Excel / Word / PDF</p>
+
+          <select id="annualPlanLevel">
+            <option value="1AM">السنة الأولى متوسط</option>
+            <option value="2AM">السنة الثانية متوسط</option>
+            <option value="3AM">السنة الثالثة متوسط</option>
+            <option value="4AM">السنة الرابعة متوسط</option>
+            <option value="other">مستوى آخر</option>
+          </select>
+
+          <label class="primary-btn file-label">
+            اختيار الملف
+            <input type="file"
+                   id="annualPlanFileInput"
+                   accept=".xlsx,.xls,.doc,.docx,.pdf">
+          </label>
+
+        </div>
+
+
+        <div class="panel">
+
+          <div class="panel-header">
+            <h3>الملفات المحفوظة</h3>
+          </div>
+
+          <div id="annualPlanFiles"></div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           MEMOS
+      ================================================= -->
+
+      <div class="view" id="memosView">
+
+        <div class="view-header">
+
+          <div>
+            <span class="eyebrow">المذكرات</span>
+            <h2>أرشيف المذكرات</h2>
+          </div>
+
+        </div>
+
+
+        <div class="upload-card">
+
+          <div class="upload-icon">
+            <i class="fa-solid fa-file-lines"></i>
+          </div>
+
+          <h3>إضافة مذكرة</h3>
+
+          <select id="memoLevel">
+            <option value="1AM">1AM</option>
+            <option value="2AM">2AM</option>
+            <option value="3AM">3AM</option>
+            <option value="4AM">4AM</option>
+            <option value="other">مستوى آخر</option>
+          </select>
+
+          <select id="memoType">
+            <option>مذكرة الدرس</option>
+            <option>عرض حال</option>
+            <option>نوع آخر</option>
+          </select>
+
+          <label class="primary-btn file-label">
+            اختيار الملف
+            <input type="file"
+                   id="memoFile"
+                   accept=".doc,.docx,.pdf">
+          </label>
+
+        </div>
+
+
+        <div class="panel">
+          <h3>المذكرات المحفوظة</h3>
+          <div id="memosFiles"></div>
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           EXAMS
+      ================================================= -->
+
+      <div class="view" id="examsView">
+
+        <div class="view-header">
+
+          <div>
+            <span class="eyebrow">التقويم</span>
+            <h2>الفروض والاختبارات</h2>
+          </div>
+
+        </div>
+
+
+        <div class="upload-card">
+
+          <div class="upload-icon">
+            <i class="fa-solid fa-file-circle-check"></i>
+          </div>
+
+          <h3>إضافة اختبار</h3>
+
+          <select id="examLevel">
+            <option value="1AM">1AM</option>
+            <option value="2AM">2AM</option>
+            <option value="3AM">3AM</option>
+            <option value="4AM">4AM</option>
+          </select>
+
+          <select id="examType">
+            <option>فرض الفصل الأول</option>
+            <option>اختبار الفصل الأول</option>
+            <option>فرض الفصل الثاني</option>
+            <option>اختبار الفصل الثاني</option>
+            <option>فرض الفصل الثالث</option>
+            <option>اختبار الفصل الثالث</option>
+            <option>حل نموذجي</option>
+            <option>سلم التنقيط</option>
+          </select>
+
+          <label class="primary-btn file-label">
+            اختيار الملف
+            <input type="file"
+                   id="examFile"
+                   accept=".xlsx,.xls,.doc,.docx,.pdf,.jpg,.jpeg,.png,.zip">
+          </label>
+
+        </div>
+
+
+        <div class="panel">
+          <h3>الأرشيف</h3>
+          <div id="examsFiles"></div>
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           STATISTICS
+      ================================================= -->
+
+      <div class="view" id="statisticsView">
+
+        <div class="view-header">
+
+          <div>
+            <span class="eyebrow">التحليل</span>
+            <h2>الإحصائيات</h2>
+            <p>نظرة عامة على العمل البيداغوجي.</p>
+          </div>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+              <span>إجمالي التلاميذ</span>
+              <strong id="statsStudents">0</strong>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon purple">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div>
+              <span>الأقسام</span>
+              <strong id="statsClasses">0</strong>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <i class="fa-solid fa-book"></i>
+            </div>
+            <div>
+              <span>سجلات اليومي</span>
+              <strong id="statsLogs">0</strong>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon orange">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div>
+              <span>الحصص المسجلة</span>
+              <strong id="statsSessions">0</strong>
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="dashboard-two-columns">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>الأقسام</h3>
+            </div>
+            <div id="classStatistics"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>التقدم</h3>
+            </div>
+
+            <div class="big-progress">
+              <div class="circle-progress">
+                <span id="statisticsProgress">0%</span>
+              </div>
+              <p>التقدم التقريبي في البرنامج</p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           PROFILE
+      ================================================= -->
+
+      <div class="view" id="profileView">
+
+        <div class="view-header">
+
+          <div>
+            <span class="eyebrow">الإدارة</span>
+            <h2>الملف المهني للأستاذ</h2>
+          </div>
+
+        </div>
+
+
+        <div class="profile-card panel">
+
+          <div class="profile-photo-area">
+
+            <div class="large-avatar" id="profileAvatar">
+              أ
+            </div>
+
+            <label class="secondary-btn file-label">
+              تغيير الصورة
+              <input type="file"
+                     id="profilePhoto"
+                     accept="image/*">
+            </label>
+
+          </div>
+
+
+          <div class="form-grid">
+
+            <div class="field">
+              <label>الاسم</label>
+              <input id="profileFirstName">
+            </div>
+
+            <div class="field">
+              <label>اللقب</label>
+              <input id="profileLastName">
+            </div>
+
+            <div class="field">
+              <label>تاريخ الميلاد</label>
+              <input type="date" id="profileBirth">
+            </div>
+
+            <div class="field">
+              <label>الشهادة</label>
+              <input id="profileCertificate">
+            </div>
+
+            <div class="field">
+              <label>تاريخ أول توظيف</label>
+              <input type="date" id="profileFirstAppointment">
+            </div>
+
+            <div class="field">
+              <label>الرتبة الحالية</label>
+              <input id="profileRank">
+            </div>
+
+            <div class="field">
+              <label>تاريخ بداية الرتبة</label>
+              <input type="date" id="profileRankDate">
+            </div>
+
+            <div class="field">
+              <label>الدرجة الحالية</label>
+              <input id="profileGrade">
+            </div>
+
+            <div class="field">
+              <label>تاريخ بداية الدرجة</label>
+              <input type="date" id="profileGradeDate">
+            </div>
+
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" id="saveProfileBtn">
+              <i class="fa-solid fa-save"></i>
+              حفظ الملف
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           DOCUMENTS
+      ================================================= -->
+
+      <div class="view" id="documentsView">
+
+        <div class="view-header">
+
+          <div>
+            <span class="eyebrow">الإدارة</span>
+            <h2>الوثائق الإدارية</h2>
+          </div>
+
+          <label class="primary-btn file-label">
+            <i class="fa-solid fa-upload"></i>
+            إضافة وثيقة
+            <input type="file"
+                   id="adminDocumentFile"
+                   accept=".pdf,.doc,.docx,.xlsx,.xls,.jpg,.jpeg,.png,.zip">
+          </label>
+
+        </div>
+
+
+        <div class="panel">
+          <div id="adminDocumentsList"></div>
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           BACKUP
+      ================================================= -->
+
+      <div class="view" id="backupView">
+
+        <div class="view-header">
+
+          <div>
+            <span class="eyebrow">حماية البيانات</span>
+            <h2>النسخ الاحتياطي</h2>
+            <p>
+              احفظ نسخة من بيانات المنصة على جهازك.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="backup-grid">
+
+          <div class="backup-card">
+
+            <div class="backup-icon">
+              <i class="fa-solid fa-download"></i>
+            </div>
+
+            <h3>إنشاء نسخة احتياطية</h3>
+
+            <p>
+              يتم تصدير بيانات المنصة في ملف JSON
+              يمكن الاحتفاظ به واستعادته لاحقاً.
+            </p>
+
+            <button class="primary-btn" id="createBackupBtn">
+              إنشاء النسخة
+            </button>
+
+          </div>
+
+
+          <div class="backup-card">
+
+            <div class="backup-icon">
+              <i class="fa-solid fa-upload"></i>
+            </div>
+
+            <h3>استعادة نسخة</h3>
+
+            <p>
+              استعادة بيانات تم تصديرها سابقاً.
+            </p>
+
+            <label class="secondary-btn file-label">
+              اختيار النسخة
+              <input type="file"
+                     id="restoreBackupInput"
+                     accept=".json">
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <div class="danger-zone">
+
+          <h3>منطقة حساسة</h3>
+
+          <p>
+            حذف البيانات المحلية سيزيل بيانات المنصة
+            من هذا المتصفح.
+          </p>
+
+          <button class="danger-btn" id="clearAllDataBtn">
+            <i class="fa-solid fa-trash"></i>
+            حذف جميع البيانات
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           AI ASSISTANT
+      ================================================= -->
+
+      <div class="view" id="assistantView">
+
+        <div class="view-header">
+
+          <div>
+            <span class="eyebrow">الذكاء الاصطناعي</span>
+            <h2>المساعد البيداغوجي</h2>
+            <p>
+              مساحة مساعدة لإعداد الدروس والفروض والأنشطة.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="assistant-layout">
+
+          <div class="assistant-panel panel">
+
+            <div class="assistant-header">
+              <div class="ai-avatar">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+
+              <div>
+                <strong>المساعد الذكي</strong>
+                <span>مساعد إعداد المحتوى</span>
+              </div>
+            </div>
+
+
+            <div id="assistantMessages"
+                 class="assistant-messages">
+
+              <div class="ai-message">
+                <strong>المساعد:</strong>
+                <p>
+                  اكتب ما تريد إعداده، مثل:
+                  "حضّر لي وضعية إدماجية للسنة الثالثة متوسط".
+                </p>
+              </div>
+
+            </div>
+
+
+            <div class="assistant-input">
+
+              <textarea id="assistantInput"
+                        placeholder="اكتب طلبك هنا..."></textarea>
+
+              <button id="assistantSendBtn"
+                      class="primary-btn">
+                <i class="fa-solid fa-paper-plane"></i>
+                إرسال
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="panel assistant-tools">
+
+            <h3>أدوات سريعة</h3>
+
+            <button data-ai-prompt="أعد لي مذكرة درس نموذجية">
+              <i class="fa-solid fa-file-lines"></i>
+              إعداد مذكرة
+            </button>
+
+            <button data-ai-prompt="اقترح لي وضعية إدماجية">
+              <i class="fa-solid fa-puzzle-piece"></i>
+              وضعية إدماجية
+            </button>
+
+            <button data-ai-prompt="أنشئ لي أسئلة فرض">
+              <i class="fa-solid fa-file-circle-check"></i>
+              إعداد فرض
+            </button>
+
+            <button data-ai-prompt="اقترح خطة معالجة للتلاميذ المتعثرين">
+              <i class="fa-solid fa-chart-line"></i>
+              خطة معالجة
+            </button>
+
+            <button data-ai-prompt="حلل نتائج القسم واقترح ملاحظات">
+              <i class="fa-solid fa-magnifying-glass-chart"></i>
+              تحليل النتائج
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL
+===================================================== -->
+
+<div class="modal-overlay" id="modalOverlay">
+
+  <div class="modal">
+
+    <button class="modal-close" id="modalClose">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <div id="modalContent"></div>
+
+  </div>
+
+</div>
+
+
+<script>
+  /* CodePen: JavaScript tab contains the application logic */
+</script>
+
+</body>
+</html>
